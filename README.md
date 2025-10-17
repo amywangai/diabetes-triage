@@ -187,3 +187,191 @@ MIT License
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
+
+
+## 🔬 Benchmarking
+
+Compare model versions:
+```bash
+python scripts/benchmark.py
+```
+
+This will output performance metrics for all trained models including:
+- Accuracy metrics (RMSE, MAE, R²)
+- Inference speed (ms per sample, throughput)
+- Model size
+
+## 🎯 Model Versions
+
+### Version Comparison Table
+
+| Version | Algorithm | RMSE | R² | Model Size | Notes |
+|---------|-----------|------|-----|------------|-------|
+| v0.1 | LinearRegression | 55.02 | 0.452 | ~5KB | Baseline |
+| v0.2 | Ridge (α=10) | 54.12 | 0.467 | ~5KB | Better generalization |
+
+### When to Use Each Version
+
+- **v0.1**: Simplest model, fastest training, good for prototyping
+- **v0.2**: Production-ready, better generalization, recommended for clinical use
+
+## 🔐 Security Considerations
+
+### Input Validation
+- All API inputs are validated using Pydantic models
+- Type checking ensures only numeric values are accepted
+- Out-of-range values return clear error messages
+
+### Container Security
+- Runs as non-root user (in production setup)
+- Minimal base image (Python slim)
+- No sensitive data in image
+- Regular security updates via base image
+
+### Model Security
+- Model file integrity should be verified
+- Consider signing model artifacts in production
+- Implement rate limiting for production deployments
+
+## 🚀 Production Deployment
+
+### Kubernetes Deployment
+
+Example deployment manifest:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diabetes-ml-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: diabetes-ml
+  template:
+    metadata:
+      labels:
+        app: diabetes-ml
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/<your-username>/diabetes-triage-ml:v0.2
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MODEL_VERSION` | Model version to use | `v0.1` |
+| `LOG_LEVEL` | Logging level | `INFO` |
+| `PORT` | API port | `8000` |
+
+## 📈 Monitoring & Observability
+
+### Metrics to Monitor
+
+1. **Model Performance**
+   - Prediction latency (p50, p95, p99)
+   - Error rates
+   - Model accuracy drift
+
+2. **System Health**
+   - API response times
+   - Memory usage
+   - CPU utilization
+   - Request throughput
+
+3. **Business Metrics**
+   - Predictions per day
+   - High-risk patient identification rate
+   - False positive/negative rates
+
+### Logging
+
+Logs are structured and include:
+- Timestamp
+- Request ID
+- Input features (anonymized)
+- Prediction
+- Inference time
+
+## 🤝 Contributing Guidelines
+
+### Code Style
+- Follow PEP 8
+- Use type hints
+- Maximum line length: 100 characters
+- Use meaningful variable names
+
+### Testing Requirements
+- Minimum 80% code coverage
+- All tests must pass
+- Include integration tests for new features
+
+### Commit Message Format
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+Example:
+```
+feat(model): add Ridge regression for v0.2
+
+- Implement Ridge with alpha=10
+- Improve RMSE by 1.6%
+- Maintain backward compatibility
+
+Closes #42
+```
+
+## 🐛 Known Issues & Limitations
+
+1. **Dataset Limitation**: Currently uses synthetic diabetes dataset. In production, would need real EHR data.
+2. **Model Scope**: Predicts progression index, not specific clinical outcomes.
+3. **Feature Engineering**: Minimal feature engineering applied. Could benefit from domain expert input.
+4. **Calibration**: Scores not calibrated to clinical risk thresholds yet.
+
+## 📚 References
+
+- [Scikit-learn Diabetes Dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#diabetes-dataset)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/<your-username>/diabetes-triage-ml/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/<your-username>/diabetes-triage-ml/discussions)
+
+## 🏆 Acknowledgments
+
+- Scikit-learn for the diabetes dataset
+- FastAPI for the excellent web framework
+- GitHub for Actions and Container Registry

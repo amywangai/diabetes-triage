@@ -10,7 +10,6 @@ from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge  # Added Ridge
-from sklearn.ensemble import RandomForestRegressor  # Added RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 # Set random seed for reproducibility

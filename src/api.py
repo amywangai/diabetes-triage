@@ -4,7 +4,6 @@ FastAPI service for diabetes progression prediction.
 import pickle
 import json
 from pathlib import Path
-from typing import Dict
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import numpy as np
@@ -20,11 +19,9 @@ app = FastAPI(
     description="ML service for predicting diabetes disease progression",
     version="0.1.0"
 )
-
 # Global variables
 model_pipeline = None
 model_metadata = None
-
 
 def load_model():
     """Load the trained model and metadata."""
@@ -44,10 +41,8 @@ def load_model():
     
     print(f"Model loaded: {model_metadata.get('version', 'unknown')}")
 
-
 # Load model on startup
 load_model()
-
 
 class PredictionInput(BaseModel):
     """Input schema for prediction."""
@@ -78,12 +73,10 @@ class PredictionInput(BaseModel):
             }
         }
 
-
 class PredictionOutput(BaseModel):
     """Output schema for prediction."""
     prediction: float = Field(..., description="Predicted progression score")
     model_version: str = Field(..., description="Model version used")
-
 
 @app.get("/health")
 def health_check():
@@ -92,7 +85,6 @@ def health_check():
         "status": "ok",
         "model_version": model_metadata.get("version", "unknown")
     }
-
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(input_data: PredictionInput):
@@ -114,10 +106,8 @@ def predict(input_data: PredictionInput):
             prediction=prediction,
             model_version=model_metadata.get("version", "unknown")
         )
-    
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
-
 
 @app.get("/")
 def root():
@@ -131,7 +121,6 @@ def root():
             "docs": "/docs"
         }
     }
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,12 +1,10 @@
 """
 Tests for the API endpoints.
 """
-import pytest
 from fastapi.testclient import TestClient
 from src.api import app
 
 client = TestClient(app)
-
 
 def test_health_check():
     """Test health check endpoint."""
@@ -16,7 +14,6 @@ def test_health_check():
     assert data["status"] == "ok"
     assert "model_version" in data
 
-
 def test_root():
     """Test root endpoint."""
     response = client.get("/")
@@ -24,7 +21,6 @@ def test_root():
     data = response.json()
     assert "service" in data
     assert "endpoints" in data
-
 
 def test_predict_valid_input():
     """Test prediction with valid input."""
@@ -46,7 +42,6 @@ def test_predict_valid_input():
     assert "prediction" in data
     assert "model_version" in data
     assert isinstance(data["prediction"], (int, float))
-
 
 def test_predict_missing_field():
     """Test prediction with missing field."""

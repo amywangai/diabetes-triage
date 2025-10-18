@@ -1,6 +1,7 @@
 """
 Tests for model training and prediction.
 """
+
 import numpy as np
 import json
 from pathlib import Path
@@ -13,7 +14,18 @@ def test_load_data():
     assert X.shape[0] == 442
     assert X.shape[1] == 10
     assert y.shape[0] == 442
-    assert list(X.columns) == ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
+    assert list(X.columns) == [
+        "age",
+        "sex",
+        "bmi",
+        "bp",
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+    ]
 
 
 def test_train_model_v01():
@@ -85,7 +97,7 @@ def test_model_artifacts_exist():
         assert model_path.stat().st_size > 0
 
     if metrics_path.exists():
-        with open(metrics_path, 'r') as f:
+        with open(metrics_path, "r") as f:
             metrics = json.load(f)
         assert "version" in metrics
         assert "metrics" in metrics

@@ -1,6 +1,7 @@
 """
 Training script for diabetes progression prediction model.
 """
+
 import os
 import pickle
 import json
@@ -68,11 +69,7 @@ def evaluate_model(pipeline, X_test, y_test):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r2 = r2_score(y_test, y_pred)
 
-    metrics = {
-        "rmse": float(rmse),
-        "r2": float(r2),
-        "n_test": len(y_test)
-    }
+    metrics = {"rmse": float(rmse), "r2": float(r2), "n_test": len(y_test)}
 
     print(f"RMSE: {rmse:.2f}")
     print(f"R²: {r2:.3f}")
@@ -91,7 +88,7 @@ def save_artifacts(pipeline, metrics):
     metrics_with_version = {
         "version": MODEL_VERSION,
         "metrics": metrics,
-        "random_seed": RANDOM_SEED
+        "random_seed": RANDOM_SEED,
     }
 
     with open(metrics_path, "w") as f:

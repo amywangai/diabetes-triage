@@ -1,6 +1,7 @@
 """
 FastAPI service for diabetes progression prediction.
 """
+
 import pickle
 import json
 from pathlib import Path
@@ -17,7 +18,7 @@ METRICS_PATH = MODEL_DIR / "metrics.json"
 app = FastAPI(
     title="Diabetes Progression Prediction API",
     description="ML service for predicting diabetes disease progression",
-    version="0.1.0"
+    version="0.1.0",
 )
 # Global variables
 model_pipeline = None
@@ -49,6 +50,7 @@ load_model()
 
 class PredictionInput(BaseModel):
     """Input schema for prediction."""
+
     age: float = Field(..., description="Age (standardized)")
     sex: float = Field(..., description="Sex (standardized)")
     bmi: float = Field(..., description="Body mass index (standardized)")
@@ -72,13 +74,14 @@ class PredictionInput(BaseModel):
                 "s3": -0.02,
                 "s4": 0.02,
                 "s5": 0.02,
-                "s6": -0.001
+                "s6": -0.001,
             }
         }
 
 
 class PredictionOutput(BaseModel):
     """Output schema for prediction."""
+
     prediction: float = Field(..., description="Predicted progression score")
     model_version: str = Field(..., description="Model version used")
 
@@ -86,10 +89,7 @@ class PredictionOutput(BaseModel):
 @app.get("/health")
 def health_check():
     """Health check endpoint."""
-    return {
-        "status": "ok",
-        "model_version": model_metadata.get("version", "unknown")
-    }
+    return {"status": "ok", "model_version": model_metadata.get("version", "unknown")}
 
 
 @app.post("/predict", response_model=PredictionOutput)
@@ -110,7 +110,7 @@ def predict(input_data: PredictionInput):
 
         return PredictionOutput(
             prediction=prediction,
-            model_version=model_metadata.get("version", "unknown")
+            model_version=model_metadata.get("version", "unknown"),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
@@ -122,14 +122,11 @@ def root():
     return {
         "service": "Diabetes Progression Prediction",
         "version": model_metadata.get("version", "unknown"),
-        "endpoints": {
-            "health": "/health",
-            "predict": "/predict",
-            "docs": "/docs"
-        }
+        "endpoints": {"health": "/health", "predict": "/predict", "docs": "/docs"},
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,6 +1,7 @@
 """
 Tests for the API endpoints.
 """
+
 from fastapi.testclient import TestClient
 from src.api import app
 
@@ -37,7 +38,7 @@ def test_predict_valid_input():
         "s3": -0.02,
         "s4": 0.02,
         "s5": 0.02,
-        "s6": -0.001
+        "s6": -0.001,
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 200

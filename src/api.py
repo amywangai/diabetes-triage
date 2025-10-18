@@ -42,6 +42,7 @@ def load_model():
 
     print(f"Model loaded: {model_metadata.get('version', 'unknown')}")
 
+
 # Load model on startup
 load_model()
 

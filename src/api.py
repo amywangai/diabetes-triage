@@ -23,26 +23,28 @@ app = FastAPI(
 model_pipeline = None
 model_metadata = None
 
+
 def load_model():
     """Load the trained model and metadata."""
     global model_pipeline, model_metadata
-    
+
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
-    
+
     with open(MODEL_PATH, "rb") as f:
         model_pipeline = pickle.load(f)
-    
+
     if METRICS_PATH.exists():
         with open(METRICS_PATH, "r") as f:
             model_metadata = json.load(f)
     else:
         model_metadata = {"version": "unknown"}
-    
+
     print(f"Model loaded: {model_metadata.get('version', 'unknown')}")
 
 # Load model on startup
 load_model()
+
 
 class PredictionInput(BaseModel):
     """Input schema for prediction."""
@@ -73,10 +75,12 @@ class PredictionInput(BaseModel):
             }
         }
 
+
 class PredictionOutput(BaseModel):
     """Output schema for prediction."""
     prediction: float = Field(..., description="Predicted progression score")
     model_version: str = Field(..., description="Model version used")
+
 
 @app.get("/health")
 def health_check():
@@ -86,28 +90,30 @@ def health_check():
         "model_version": model_metadata.get("version", "unknown")
     }
 
+
 @app.post("/predict", response_model=PredictionOutput)
 def predict(input_data: PredictionInput):
     """
     Predict diabetes progression score.
-    
+
     Higher scores indicate greater disease progression risk.
     """
     try:
         # Convert input to array
         feature_names = ["age", "sex", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
         X = np.array([[getattr(input_data, f) for f in feature_names]])
-        
+
         # Make prediction
         X_scaled = model_pipeline["scaler"].transform(X)
         prediction = float(model_pipeline["model"].predict(X_scaled)[0])
-        
+
         return PredictionOutput(
             prediction=prediction,
             model_version=model_metadata.get("version", "unknown")
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
 
 @app.get("/")
 def root():
@@ -121,6 +127,7 @@ def root():
             "docs": "/docs"
         }
     }
+
 
 if __name__ == "__main__":
     import uvicorn
